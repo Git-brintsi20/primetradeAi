@@ -40,8 +40,7 @@ def place_order(
 
     Raises:
         ValueError: On invalid input.
-        BinanceAPIException: On API-level errors.
-        BinanceRequestException: On network-level errors.
+        ccxt.BaseError: On API-level or network-level errors.
     """
     symbol = validate_symbol(symbol)
     side = validate_side(side)

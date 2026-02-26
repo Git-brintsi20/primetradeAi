@@ -108,6 +108,7 @@ class BinanceClient:
             if price is None:
                 raise ValueError("Price is required for LIMIT orders.")
             ccxt_type = "limit"
+            params["timeInForce"] = "GTC"
         elif order_type == "STOP":
             if price is None:
                 raise ValueError("Price is required for STOP orders.")
@@ -115,6 +116,7 @@ class BinanceClient:
                 raise ValueError("Stop price is required for STOP orders.")
             ccxt_type = "limit"
             params["stopPrice"] = stop_price
+            params["timeInForce"] = "GTC"
         else:
             ccxt_type = "market"
             price = None  # CCXT ignores price for market orders

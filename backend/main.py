@@ -2,6 +2,7 @@
 """FastAPI server — bridges the Python trading-bot backend to the frontend."""
 import os
 from functools import lru_cache
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
@@ -15,12 +16,12 @@ from bot.orders import place_order as _place_order
 
 load_dotenv()
 
-LOG_FILE = "app.log"
+LOG_FILE = str(Path(__file__).parent / "app.log")
 logger = setup_logging(LOG_FILE)
 
 app = FastAPI(
     title="PrimetradeAI – Binance Futures Bot",
-    description="REST API that wraps Binance Futures Testnet order placement.",
+    description="REST API that wraps Binance Futures Demo Trading order placement.",
     version="1.0.0",
 )
 

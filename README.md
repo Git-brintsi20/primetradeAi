@@ -1,114 +1,132 @@
-# PrimetradeAI — Binance Futures Testnet Trading Bot
+# PrimetradeAI — Binance Futures Trading Bot
 
-A production-grade Python trading bot for **Binance Futures Testnet (USDT-M)**, featuring a Typer CLI, a FastAPI REST bridge, and a Next.js dark-mode trading dashboard.
+> **Python 3.x  ·  CCXT  ·  Typer CLI  ·  FastAPI  ·  Next.js 16 Dashboard**
+
+A professional trading bot that places **Market**, **Limit**, and **Stop-Limit** orders on Binance Futures (USDT-M), with structured logging, input validation, and a dark-mode web dashboard.
 
 ---
 
-## Architecture
+## ✅ Requirement Checklist
+
+| # | Requirement | Status | Details |
+|---|-------------|--------|---------|
+| 1 | Place **Market** and **Limit** orders | ✅ Done | MARKET BUY filled, LIMIT SELL placed — see logs below |
+| 2 | Support **BUY** and **SELL** sides | ✅ Done | Both sides tested and verified |
+| 3 | CLI input: symbol, side, type, qty, price | ✅ Done | Typer CLI with `--symbol`, `--side`, `--type`, `--quantity`, `--price` |
+| 4 | Clear output: request summary + response | ✅ Done | Boxed CLI output with orderId, status, executedQty, avgPrice |
+| 5 | Structured code (client + CLI layers) | ✅ Done | `bot/client.py` → `bot/orders.py` → `cli.py` (3-layer separation) |
+| 6 | Logging to file | ✅ Done | `app.log` — all API calls, responses, and errors |
+| 7 | Exception handling | ✅ Done | Input validation, API errors, network failures — all caught and logged |
+| 8 | `README.md` with setup + examples | ✅ Done | You're reading it |
+| 9 | `requirements.txt` | ✅ Done | 6 pinned dependencies |
+| 10 | Log files (≥1 MARKET, ≥1 LIMIT) | ✅ Done | 3 log files included (market, limit, stop-limit) |
+| **Bonus** | Stop-Limit order type | ✅ Done | Full end-to-end: validator → client → CLI → API → frontend |
+| **Bonus** | Lightweight UI | ✅ Done | Next.js 16 + Shadcn UI dark-mode trading dashboard |
+
+---
+
+## ⚠️ Important: API Migration Note
+
+> **Binance deprecated the Futures Testnet** (`testnet.binancefuture.com`) and migrated all testnet functionality to their new **Demo Trading** system ([Binance FAQ](https://www.binance.com/en/support/faq/detail/9be58f73e5e14338809e3b705b9687dd)).
+>
+> The `python-binance` library **does not support** the new Demo Trading endpoint. After hitting `Invalid API-key` errors with every approach using `python-binance`, I migrated to **[CCXT](https://github.com/ccxt/ccxt)** — a battle-tested exchange library that supports the new system natively via `exchange.enable_demo_trading(True)`.
+>
+> **The task was not impossible — it just needed a different library.** Everything else (structured code, CLI, validation, logging) is unchanged. CCXT wraps the same Binance REST API under the hood.
+
+---
+
+## Project Structure
 
 ```
 primetradeAi/
-├── backend/                       # Python backend
+├── backend/
 │   ├── bot/
 │   │   ├── __init__.py            # Package exports
-│   │   ├── client.py              # BinanceClient wrapper (testnet)
-│   │   ├── orders.py              # Order placement + validation orchestration
-│   │   ├── validators.py          # Pure input validation helpers
-│   │   └── logging_config.py      # Structured logging (file + console)
+│   │   ├── client.py              # BinanceClient wrapper (CCXT + Demo Trading)
+│   │   ├── orders.py              # Validates → delegates to client
+│   │   ├── validators.py          # Pure input validation (no side effects)
+│   │   └── logging_config.py      # File + console structured logging
 │   ├── logs/
-│   │   ├── market_order.log       # Sample MARKET order log
-│   │   └── limit_order.log        # Sample LIMIT order log
+│   │   ├── market_order.log       # ✅ Real MARKET order log
+│   │   ├── limit_order.log        # ✅ Real LIMIT order log
+│   │   └── stop_limit_order.log   # ✅ Real STOP-LIMIT order log (bonus)
 │   ├── cli.py                     # Typer CLI entry point
-│   ├── main.py                    # FastAPI server (REST bridge)
+│   ├── main.py                    # FastAPI REST bridge for frontend
 │   ├── requirements.txt
 │   └── .env.example
-├── client-tradingBot/             # Next.js 16 frontend
+├── client-tradingBot/             # Next.js 16 frontend (bonus)
 │   ├── app/                       # App Router pages
 │   ├── components/                # Dashboard, order form, history, terminal
-│   ├── components/ui/             # Shadcn UI primitives
-│   ├── lib/                       # Utilities + config
-│   ├── hooks/                     # Custom React hooks
-│   ├── package.json
-│   └── .env.example
+│   ├── lib/config.ts              # Centralised API URL config
+│   └── package.json
 ├── .gitignore
-├── LICENSE
 └── README.md
 ```
 
-### Design decisions
+### Tech Stack
 
-| Layer        | Technology                | Rationale                                                  |
-| ------------ | ------------------------- | ---------------------------------------------------------- |
-| Bot core     | `python-binance`          | Official, well-maintained SDK with full futures support     |
-| CLI          | Typer                     | Typed CLI with auto-generated help — meets the "must-have"  |
-| REST bridge  | FastAPI + Uvicorn         | Async, auto-documented API (`/docs`) for the frontend      |
-| Validation   | Pydantic v2 + custom fns  | Schema validation in FastAPI; pure-function validation in CLI|
-| Frontend     | Next.js 16, Shadcn UI, Tailwind CSS | High-density dark-mode dashboard inspired by Binance UI |
-| Config       | python-dotenv / `.env`    | Secrets stay out of source control                         |
+| Layer | Technology | Why |
+|-------|-----------|-----|
+| Bot core | **CCXT** (Binance) | Supports Demo Trading natively; `python-binance` does not |
+| CLI | **Typer** | Typed CLI with auto `--help`, validation, and rich output |
+| REST bridge | **FastAPI + Uvicorn** | Async, auto-docs at `/docs`, bridges CLI logic to frontend |
+| Validation | **Pydantic v2** + custom fns | Schema validation (API) + pure functions (CLI) |
+| Frontend | **Next.js 16**, Shadcn UI, Tailwind | High-density dark dashboard inspired by Binance UI |
+| Config | **python-dotenv** | Secrets in `.env`, never committed |
 
 ---
 
-## Quick start
+## Setup
 
 ### Prerequisites
 
-- **Python 3.10+** and `pip`
-- **Node.js 18+** and `npm` (for the frontend)
-- A **Binance Futures Demo Trading** account with API credentials  
-  → Generate at <https://demo.binance.com/en/my/settings/api-management>
+- **Python 3.10+** with `pip`
+- **Node.js 18+** with `npm` (only for frontend)
+- **Binance Demo Trading** API keys → [Generate here](https://demo.binance.com/en/my/settings/api-management)
 
-### 1 — Backend setup
+### Backend
 
 ```bash
 cd backend
-
-# Create and activate a virtual environment
 python -m venv .venv
-.venv\Scripts\activate        # macOS/Linux: source .venv/bin/activate
-
-# Install dependencies
+.venv\Scripts\activate              # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 
-# Configure credentials
 cp .env.example .env
-# Edit .env → set BINANCE_API_KEY and BINANCE_API_SECRET
+# Edit .env → paste your BINANCE_API_KEY and BINANCE_API_SECRET
 ```
 
-### 2 — Frontend setup
+### Frontend (optional)
 
 ```bash
 cd client-tradingBot
 npm install
-
-# (Optional) copy and edit .env.example → .env.local if backend is on a different URL
 ```
 
 ---
 
 ## Usage
 
-### CLI
-
-Run from the `backend/` directory.
+### CLI (run from `backend/`)
 
 ```bash
 # MARKET BUY
-python cli.py order --symbol BTCUSDT --side BUY --type MARKET --quantity 0.001
+python cli.py order --symbol BTCUSDT --side BUY --type MARKET --quantity 0.005
 
 # LIMIT SELL
-python cli.py order --symbol BTCUSDT --side SELL --type LIMIT --quantity 0.001 --price 70000
+python cli.py order --symbol BTCUSDT --side SELL --type LIMIT --quantity 0.003 --price 72000
 
-# STOP-LIMIT BUY (bonus feature)
-python cli.py order --symbol BTCUSDT --side BUY --type STOP --quantity 0.001 --price 69500 --stop-price 69000
+# STOP-LIMIT SELL (bonus)
+python cli.py order --symbol BTCUSDT --side SELL --type STOP --quantity 0.002 --price 65000 --stop-price 65500
 
-# Check balance
+# Account balance
 python cli.py balance
 
 # Help
 python cli.py --help
 ```
 
-**Sample output:**
+**Sample CLI output (real execution):**
 
 ```
 ====================================================
@@ -117,7 +135,7 @@ python cli.py --help
   Symbol     : BTCUSDT
   Side       : BUY
   Type       : MARKET
-  Quantity   : 0.001
+  Quantity   : 0.005
 ====================================================
 
 ✅  Order placed successfully!
@@ -125,100 +143,117 @@ python cli.py --help
 ====================================================
   Order Response
 ====================================================
-  Order ID      : 4204474429
+  Order ID      : 12550241182
   Symbol        : BTCUSDT
   Status        : FILLED
   Side          : BUY
   Type          : MARKET
-  Orig Qty      : 0.001
-  Executed Qty  : 0.001
-  Avg Price     : 64231.50
+  Orig Qty      : 0.005
+  Executed Qty  : 0.005
+  Avg Price     : 68169.70000
 ====================================================
 ```
 
-### FastAPI server
+### FastAPI Server
 
 ```bash
 cd backend
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+uvicorn main:app --reload --port 8000
 ```
 
-Interactive Swagger docs → <http://localhost:8000/docs>
+Swagger docs → [http://localhost:8000/docs](http://localhost:8000/docs)
 
-| Method | Path       | Description                     |
-| ------ | ---------- | ------------------------------- |
-| GET    | `/`        | Health check                    |
-| GET    | `/balance` | Futures account balance         |
-| POST   | `/order`   | Place MARKET / LIMIT / STOP order |
-| GET    | `/logs`    | Tail `app.log` (last N lines)  |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | Health check |
+| `GET` | `/balance` | Futures account balance |
+| `POST` | `/order` | Place order (MARKET / LIMIT / STOP) |
+| `GET` | `/logs?lines=100` | Tail `app.log` |
 
-**POST /order example:**
+**POST /order body:**
 
 ```json
 {
   "symbol": "BTCUSDT",
   "side": "BUY",
   "order_type": "MARKET",
-  "quantity": 0.001
+  "quantity": 0.005
 }
 ```
 
-### Frontend dashboard
+### Frontend Dashboard
 
 ```bash
 cd client-tradingBot
-npm run dev
+npm run dev                         # → http://localhost:3000
 ```
 
-Open <http://localhost:3000>. The dashboard connects to the FastAPI backend at `localhost:8000`.
-
-**Features:**
-
-- Side toggle (green BUY / red SELL) with Binance-style colour coding
-- Conditional fields: price appears for Limit; price + stop-price appear for Stop-Limit
-- Disabled submit button until all required fields are valid
-- Toast notifications (sonner) for success / error / network failures
-- Execution history table showing real API response data (orderId, status, avgPrice)
-- Live terminal panel rendering request/response JSON in real time
+**Features:** BUY/SELL toggle · conditional price fields · toast notifications · execution history table · live terminal · dark mode
 
 ---
 
-## Logging
+## Log Files (Deliverable)
 
-All API requests, responses, and errors are written to `backend/app.log` **and** to stdout.
+All three log files are in [`backend/logs/`](backend/logs/) — captured from **real orders executed on 2026-02-26**:
 
-Committed sample logs:
+### `market_order.log` — MARKET BUY 0.005 BTC → FILLED
 
-| File                          | Content                    |
-| ----------------------------- | -------------------------- |
-| `backend/logs/market_order.log` | BUY MARKET 0.001 BTCUSDT  |
-| `backend/logs/limit_order.log`  | SELL LIMIT 0.001 BTCUSDT @ 70 000 |
+```log
+2026-02-26 18:38:19 [INFO] bot.client: Initialising Binance Futures Demo Trading client…
+2026-02-26 18:38:19 [INFO] bot.client: Binance Futures Demo Trading client ready
+2026-02-26 18:38:19 [INFO] bot.orders: Order request — symbol=BTCUSDT, side=BUY, type=MARKET, qty=0.005
+2026-02-26 18:38:19 [INFO] bot.client: Placing order — {symbol: BTCUSDT, side: BUY, type: MARKET, quantity: 0.005}
+2026-02-26 18:38:26 [INFO] bot.client: Order placed — orderId=12550241182, status=FILLED
+```
+
+### `limit_order.log` — LIMIT SELL 0.003 BTC @ $72,000 → NEW
+
+```log
+2026-02-26 18:39:02 [INFO] bot.client: Initialising Binance Futures Demo Trading client…
+2026-02-26 18:39:02 [INFO] bot.client: Binance Futures Demo Trading client ready
+2026-02-26 18:39:02 [INFO] bot.orders: Order request — symbol=BTCUSDT, side=SELL, type=LIMIT, qty=0.003, price=72000.0
+2026-02-26 18:39:02 [INFO] bot.client: Placing order — {symbol: BTCUSDT, side: SELL, type: LIMIT, quantity: 0.003, price: 72000.0}
+2026-02-26 18:39:06 [INFO] bot.client: Order placed — orderId=12550242484, status=NEW
+```
+
+### `stop_limit_order.log` — STOP SELL 0.002 BTC, trigger $65,500 → OPEN *(bonus)*
+
+```log
+2026-02-26 18:39:59 [INFO] bot.client: Initialising Binance Futures Demo Trading client…
+2026-02-26 18:39:59 [INFO] bot.client: Binance Futures Demo Trading client ready
+2026-02-26 18:39:59 [INFO] bot.orders: Order request — symbol=BTCUSDT, side=SELL, type=STOP, qty=0.002, price=65000.0, stopPrice=65500.0
+2026-02-26 18:39:59 [INFO] bot.client: Placing order — {symbol: BTCUSDT, side: SELL, type: STOP, quantity: 0.002, stopPrice: 65500.0}
+2026-02-26 18:40:03 [INFO] bot.client: Order placed — orderId=1000000017291126, status=OPEN
+```
 
 ---
 
-## Bonus: Stop-Limit orders
+## Bonus: Stop-Limit Orders
 
-A **STOP** (stop-limit) order type has been implemented end-to-end:
+Implemented end-to-end across all layers:
 
-1. **Validator** — `validate_stop_price()` ensures `stop_price` is required and positive for STOP orders.
-2. **Client** — sends `price`, `stopPrice`, and `timeInForce=GTC` to the Binance Futures API.
-3. **CLI** — accepts `--stop-price` option.
-4. **FastAPI** — `stop_price` field in the `OrderRequest` schema.
-5. **Frontend** — conditionally renders the Stop Trigger Price input when "Stop-Limit" is selected.
+| Layer | What was added |
+|-------|---------------|
+| `validators.py` | `validate_stop_price()` — requires positive `stop_price` for STOP orders |
+| `client.py` | Sends `price` + `stopPrice` + `timeInForce=GTC` to Binance |
+| `cli.py` | `--stop-price` option |
+| `main.py` | `stop_price` field in `OrderRequest` Pydantic schema |
+| Frontend | Conditional Stop Trigger Price input when "Stop-Limit" is selected |
 
 ---
 
 ## Assumptions
 
-- All orders target the **USDT-M Futures Demo Trading** endpoint at `https://demo-fapi.binance.com`.
-  (Migrated from the deprecated `testnet.binancefuture.com` — see [Binance FAQ](https://www.binance.com/en/support/faq/detail/9be58f73e5e14338809e3b705b9687dd)).
-- LIMIT and STOP orders use `timeInForce=GTC` (Good Till Cancelled).
-- Binance lot-size rules apply — for BTCUSDT use quantities like `0.001` (3 decimal places max).
-- `BINANCE_API_KEY` and `BINANCE_API_SECRET` are stored in `backend/.env` and never committed.
+1. All orders target **Binance Futures Demo Trading** at `https://demo-fapi.binance.com`  
+   *(migrated from the now-deprecated `testnet.binancefuture.com`)*
+2. LIMIT and STOP orders use `timeInForce=GTC` (Good Till Cancelled)
+3. Binance lot-size rules apply — BTCUSDT accepts up to 3 decimal places
+4. Credentials stored in `backend/.env` (git-ignored; only `.env.example` is committed)
+5. CORS is set to `allow_origins=["*"]` — acceptable for demo/testnet usage
 
 ---
 
 ## Security
 
-- **`.env` is git-ignored.** The repo only ships `.env.example` with placeholder values.
-- These keys are for the **testnet only** — never use mainnet credentials here.
+- `.env` is **git-ignored** — the repo ships only `.env.example` with placeholders
+- All credentials target the **Demo Trading** system — never use mainnet keys
