@@ -66,15 +66,17 @@ class BinanceClient:
         order_type: str,
         quantity: float,
         price: Optional[float] = None,
+        stop_price: Optional[float] = None,
     ) -> Dict[str, Any]:
         """Place a futures order on the testnet.
 
         Args:
             symbol:     Trading pair (e.g. BTCUSDT).
             side:       BUY or SELL.
-            order_type: MARKET or LIMIT.
+            order_type: MARKET, LIMIT, or STOP (stop-limit).
             quantity:   Order quantity.
-            price:      Limit price (required when order_type == LIMIT).
+            price:      Limit price (required for LIMIT and STOP orders).
+            stop_price: Stop trigger price (required for STOP orders).
 
         Returns:
             Raw API response dict.
@@ -90,6 +92,14 @@ class BinanceClient:
             if price is None:
                 raise ValueError("Price is required for LIMIT orders.")
             params["price"] = price
+            params["timeInForce"] = "GTC"
+        elif order_type == "STOP":
+            if price is None:
+                raise ValueError("Price is required for STOP orders.")
+            if stop_price is None:
+                raise ValueError("Stop price is required for STOP orders.")
+            params["price"] = price
+            params["stopPrice"] = stop_price
             params["timeInForce"] = "GTC"
 
         logger.info("Placing order — %s", params)

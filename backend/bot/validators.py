@@ -2,7 +2,7 @@
 from typing import Optional
 
 VALID_SIDES = {"BUY", "SELL"}
-VALID_ORDER_TYPES = {"MARKET", "LIMIT"}
+VALID_ORDER_TYPES = {"MARKET", "LIMIT", "STOP"}
 
 
 def validate_symbol(symbol: str) -> str:
@@ -26,7 +26,7 @@ def validate_side(side: str) -> str:
 
 
 def validate_order_type(order_type: str) -> str:
-    """Validate order type (MARKET or LIMIT)."""
+    """Validate order type (MARKET, LIMIT, or STOP)."""
     order_type_upper = order_type.upper()
     if order_type_upper not in VALID_ORDER_TYPES:
         raise ValueError(
@@ -48,12 +48,30 @@ def validate_quantity(quantity: float) -> float:
 def validate_price(price: Optional[float], order_type: str) -> Optional[float]:
     """Validate price field.
 
-    Price is required and must be positive for LIMIT orders.
-    For MARKET orders it is ignored.
+    Price is required and must be positive for LIMIT and STOP (stop-limit)
+    orders.  For MARKET orders it is ignored.
     """
-    if order_type.upper() == "LIMIT":
+    if order_type.upper() in ("LIMIT", "STOP"):
         if price is None or price <= 0:
             raise ValueError(
-                "Price is required and must be a positive number for LIMIT orders."
+                "Price is required and must be a positive number "
+                f"for {order_type.upper()} orders."
             )
     return price
+
+
+def validate_stop_price(
+    stop_price: Optional[float], order_type: str
+) -> Optional[float]:
+    """Validate stop-trigger price.
+
+    Required and must be positive for STOP (stop-limit) orders.
+    Ignored for MARKET and LIMIT orders.
+    """
+    if order_type.upper() == "STOP":
+        if stop_price is None or stop_price <= 0:
+            raise ValueError(
+                "Stop price is required and must be a positive number "
+                "for STOP (stop-limit) orders."
+            )
+    return stop_price

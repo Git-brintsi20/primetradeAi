@@ -8,6 +8,7 @@ from .validators import (
     validate_price,
     validate_quantity,
     validate_side,
+    validate_stop_price,
     validate_symbol,
 )
 
@@ -21,6 +22,7 @@ def place_order(
     order_type: str,
     quantity: float,
     price: Optional[float] = None,
+    stop_price: Optional[float] = None,
 ) -> Dict[str, Any]:
     """Validate inputs and place a futures order via *client*.
 
@@ -28,9 +30,10 @@ def place_order(
         client:     An initialised :class:`BinanceClient`.
         symbol:     Trading pair, e.g. ``BTCUSDT``.
         side:       ``BUY`` or ``SELL``.
-        order_type: ``MARKET`` or ``LIMIT``.
+        order_type: ``MARKET``, ``LIMIT``, or ``STOP`` (stop-limit).
         quantity:   Order quantity (must be positive).
-        price:      Limit price — required when *order_type* is ``LIMIT``.
+        price:      Limit price — required for ``LIMIT`` and ``STOP`` orders.
+        stop_price: Stop trigger price — required for ``STOP`` orders.
 
     Returns:
         Raw order response dict from the Binance API.
@@ -45,14 +48,16 @@ def place_order(
     order_type = validate_order_type(order_type)
     quantity = validate_quantity(quantity)
     price = validate_price(price, order_type)
+    stop_price = validate_stop_price(stop_price, order_type)
 
     logger.info(
-        "Order request — symbol=%s, side=%s, type=%s, quantity=%s, price=%s",
+        "Order request — symbol=%s, side=%s, type=%s, qty=%s, price=%s, stopPrice=%s",
         symbol,
         side,
         order_type,
         quantity,
         price,
+        stop_price,
     )
 
-    return client.place_order(symbol, side, order_type, quantity, price)
+    return client.place_order(symbol, side, order_type, quantity, price, stop_price)
