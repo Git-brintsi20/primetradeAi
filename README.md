@@ -54,8 +54,8 @@ primetradeAi/
 
 - **Python 3.10+** and `pip`
 - **Node.js 18+** and `npm` (for the frontend)
-- A **Binance Futures Testnet** account with API credentials  
-  → Generate at <https://testnet.binancefuture.com>
+- A **Binance Futures Demo Trading** account with API credentials  
+  → Generate at <https://demo.binance.com/en/my/settings/api-management>
 
 ### 1 — Backend setup
 
@@ -210,7 +210,8 @@ A **STOP** (stop-limit) order type has been implemented end-to-end:
 
 ## Assumptions
 
-- All orders target the **USDT-M Futures Testnet** at `https://testnet.binancefuture.com`.
+- All orders target the **USDT-M Futures Demo Trading** endpoint at `https://demo-fapi.binance.com`.
+  (Migrated from the deprecated `testnet.binancefuture.com` — see [Binance FAQ](https://www.binance.com/en/support/faq/detail/9be58f73e5e14338809e3b705b9687dd)).
 - LIMIT and STOP orders use `timeInForce=GTC` (Good Till Cancelled).
 - Binance lot-size rules apply — for BTCUSDT use quantities like `0.001` (3 decimal places max).
 - `BINANCE_API_KEY` and `BINANCE_API_SECRET` are stored in `backend/.env` and never committed.
