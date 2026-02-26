@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """FastAPI server — bridges the Python trading-bot backend to the frontend."""
 import os
+from functools import lru_cache
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
@@ -38,8 +39,9 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 
 
+@lru_cache(maxsize=1)
 def _get_client() -> BinanceClient:
-    """Create a BinanceClient using env-vars for credentials."""
+    """Return a cached BinanceClient singleton (credentials from env-vars)."""
     return BinanceClient()
 
 
@@ -51,10 +53,17 @@ def _get_client() -> BinanceClient:
 class OrderRequest(BaseModel):
     symbol: str = Field(..., examples=["BTCUSDT"], description="Trading pair")
     side: str = Field(..., examples=["BUY"], description="BUY or SELL")
-    order_type: str = Field(..., examples=["MARKET"], description="MARKET or LIMIT")
+    order_type: str = Field(
+        ..., examples=["MARKET"], description="MARKET, LIMIT, or STOP"
+    )
     quantity: float = Field(..., gt=0, examples=[0.001], description="Order quantity")
     price: Optional[float] = Field(
-        None, gt=0, examples=[30000.0], description="Limit price (required for LIMIT)"
+        None, gt=0, examples=[30000.0],
+        description="Limit price (required for LIMIT and STOP orders)",
+    )
+    stop_price: Optional[float] = Field(
+        None, gt=0, examples=[29000.0],
+        description="Stop trigger price (required for STOP orders)",
     )
 
 
@@ -101,6 +110,7 @@ def create_order(order: OrderRequest) -> OrderResponse:
             order.order_type,
             order.quantity,
             order.price,
+            order.stop_price,
         )
         logger.info(
             "/order — placed orderId=%s status=%s",
