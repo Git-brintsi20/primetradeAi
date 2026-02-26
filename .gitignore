@@ -33,8 +33,8 @@ app.log
 Thumbs.db
 
 # Node / Next.js (frontend)
-frontend/node_modules/
-frontend/.next/
-frontend/out/
-frontend/.env.local
-frontend/.env.production
+client-tradingBot/node_modules/
+client-tradingBot/.next/
+client-tradingBot/out/
+client-tradingBot/.env.local
+client-tradingBot/.env.production
