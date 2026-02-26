@@ -1,0 +1,5 @@
+2026-02-26 18:39:59 [INFO    ] bot.client: Initialising Binance Futures Demo Trading client…
+2026-02-26 18:39:59 [INFO    ] bot.client: Binance Futures Demo Trading client ready (base: https://demo-fapi.binance.com/fapi/v1).
+2026-02-26 18:39:59 [INFO    ] bot.orders: Order request — symbol=BTCUSDT, side=SELL, type=STOP, qty=0.002, price=65000.0, stopPrice=65500.0
+2026-02-26 18:39:59 [INFO    ] bot.client: Placing order — {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'STOP', 'quantity': 0.002, 'price': 65000.0, 'stopPrice': 65500.0}
+2026-02-26 18:40:03 [INFO    ] bot.client: Order placed — orderId=1000000017291126, status=OPEN

@@ -1,5 +1,5 @@
-2025-07-15 10:23:01 [INFO    ] root: Initialising Binance Futures Testnet client…
-2025-07-15 10:23:01 [INFO    ] root: Binance Futures Testnet client ready.
-2025-07-15 10:23:01 [INFO    ] bot.orders: Order request — symbol=BTCUSDT, side=BUY, type=MARKET, quantity=0.001, price=None
-2025-07-15 10:23:01 [INFO    ] bot.client: Placing order — {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'MARKET', 'quantity': 0.001}
-2025-07-15 10:23:02 [INFO    ] bot.client: Order placed — orderId=4204474429, status=FILLED
+2026-02-26 18:38:19 [INFO    ] bot.client: Initialising Binance Futures Demo Trading client…
+2026-02-26 18:38:19 [INFO    ] bot.client: Binance Futures Demo Trading client ready (base: https://demo-fapi.binance.com/fapi/v1).
+2026-02-26 18:38:19 [INFO    ] bot.orders: Order request — symbol=BTCUSDT, side=BUY, type=MARKET, qty=0.005, price=None, stopPrice=None
+2026-02-26 18:38:19 [INFO    ] bot.client: Placing order — {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'MARKET', 'quantity': 0.005}
+2026-02-26 18:38:26 [INFO    ] bot.client: Order placed — orderId=12550241182, status=FILLED
