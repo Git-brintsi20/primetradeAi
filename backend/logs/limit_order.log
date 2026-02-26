@@ -1,0 +1,5 @@
+2025-07-15 10:25:14 [INFO    ] root: Initialising Binance Futures Testnet client…
+2025-07-15 10:25:14 [INFO    ] root: Binance Futures Testnet client ready.
+2025-07-15 10:25:14 [INFO    ] bot.orders: Order request — symbol=BTCUSDT, side=SELL, type=LIMIT, quantity=0.001, price=70000.0
+2025-07-15 10:25:14 [INFO    ] bot.client: Placing order — {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'LIMIT', 'quantity': 0.001, 'price': 70000.0, 'timeInForce': 'GTC'}
+2025-07-15 10:25:15 [INFO    ] bot.client: Order placed — orderId=4204474431, status=NEW
