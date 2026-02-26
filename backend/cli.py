@@ -54,10 +54,13 @@ def _print_response(response: dict) -> None:
 def order(
     symbol: str = typer.Option(..., help="Trading pair, e.g. BTCUSDT"),
     side: str = typer.Option(..., help="BUY or SELL"),
-    order_type: str = typer.Option(..., "--type", "-t", help="MARKET or LIMIT"),
+    order_type: str = typer.Option(..., "--type", "-t", help="MARKET, LIMIT, or STOP"),
     quantity: float = typer.Option(..., help="Order quantity (e.g. 0.001)"),
     price: Optional[float] = typer.Option(
-        None, help="Limit price — required for LIMIT orders"
+        None, help="Limit price — required for LIMIT and STOP orders"
+    ),
+    stop_price: Optional[float] = typer.Option(
+        None, "--stop-price", help="Stop trigger price — required for STOP orders"
     ),
 ) -> None:
     """Place a futures order on Binance Futures Testnet."""
@@ -70,11 +73,13 @@ def order(
     typer.echo(f"  Quantity   : {quantity}")
     if price is not None:
         typer.echo(f"  Price      : {price}")
+    if stop_price is not None:
+        typer.echo(f"  Stop Price : {stop_price}")
     typer.echo(f"{_DIVIDER}\n")
 
     try:
         client = BinanceClient()
-        response = _place_order(client, symbol, side, order_type, quantity, price)
+        response = _place_order(client, symbol, side, order_type, quantity, price, stop_price)
         typer.echo(
             typer.style("✅  Order placed successfully!", fg=typer.colors.GREEN, bold=True)
         )
