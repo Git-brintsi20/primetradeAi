@@ -1,6 +1,6 @@
 # PrimetradeAI — Binance Futures Trading Bot
 
-> **Python 3.x  ·  CCXT  ·  Typer CLI  ·  FastAPI  ·  Next.js 16 Dashboard**
+> **Python 3.x · CCXT · Typer CLI · FastAPI · Next.js 16 Dashboard**
 
 A professional trading bot that places **Market**, **Limit**, and **Stop-Limit** orders on Binance Futures (USDT-M), with structured logging, input validation, and a dark-mode web dashboard.
 
@@ -257,3 +257,17 @@ Implemented end-to-end across all layers:
 
 - `.env` is **git-ignored** — the repo ships only `.env.example` with placeholders
 - All credentials target the **Demo Trading** system — never use mainnet keys
+
+---
+
+## Quick Verification (3 commands)
+
+```bash
+cd backend && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+
+python cli.py balance                     # Confirm API connection + funds
+python cli.py order --symbol BTCUSDT --side BUY --type MARKET --quantity 0.005
+python cli.py order --symbol BTCUSDT --side SELL --type LIMIT --quantity 0.003 --price 72000
+```
+
+All three should succeed with real order IDs and status output.
